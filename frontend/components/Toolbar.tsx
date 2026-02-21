@@ -88,7 +88,16 @@ export default function Toolbar({
 
                 <div className={styles.roomInfo} onClick={handleCopyCode} title="Click to copy room code" style={{ cursor: "pointer" }}>
                     <span className={styles.roomLabel}>Room</span>
-                    <code className={styles.roomCode}>{codeCopied ? "Copied!" : roomId}</code>
+                    <code className={styles.roomCode}>
+                        {codeCopied ? (
+                            <>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: "middle", marginRight: "4px" }}>
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                                Copied!
+                            </>
+                        ) : roomId}
+                    </code>
                 </div>
             </div>
 
