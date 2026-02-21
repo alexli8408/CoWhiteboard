@@ -40,6 +40,12 @@ export default function Home() {
     router.push(`/board/${roomId}`);
   };
 
+  const handleSignInAndCreate = () => {
+    const roomId = generateRoomCode();
+    localStorage.setItem("redirectAfterLogin", `/board/${roomId}`);
+    signInWithGoogle();
+  };
+
   const handleJoinBoard = (e: React.FormEvent) => {
     e.preventDefault();
     const code = joinCode.trim();
@@ -132,7 +138,7 @@ export default function Home() {
           ) : (
             <button
               className="btn-primary"
-              onClick={signInWithGoogle}
+              onClick={handleSignInAndCreate}
               id="signin-to-create-btn"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
