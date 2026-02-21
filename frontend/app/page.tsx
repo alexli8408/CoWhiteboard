@@ -2,9 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/components/AuthProvider";
 import styles from "./page.module.css";
+
+function generateRoomCode(length = 8) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let code = "";
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  for (let i = 0; i < length; i++) {
+    code += chars[array[i] % chars.length];
+  }
+  return code;
+}
 
 export default function Home() {
   const router = useRouter();
@@ -26,7 +36,7 @@ export default function Home() {
 
   const handleCreateBoard = async () => {
     setIsCreating(true);
-    const roomId = uuidv4();
+    const roomId = generateRoomCode();
     router.push(`/board/${roomId}`);
   };
 
