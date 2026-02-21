@@ -132,15 +132,15 @@
 }
 
 .toolbarAvatar {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: 2px solid var(--border-subtle);
 }
 
 .avatarFallback {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: 2px solid var(--border-subtle);
     background: var(--accent-gradient);
