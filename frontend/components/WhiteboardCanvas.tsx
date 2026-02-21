@@ -158,7 +158,10 @@ export default function WhiteboardCanvas({
 
     return (
         <Tldraw
-            onMount={handleMount}
+            onMount={(editor) => {
+                editor.user.updateUserPreferences({ colorScheme: "dark" });
+                handleMount(editor);
+            }}
             autoFocus
         />
     );
