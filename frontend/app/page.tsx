@@ -102,7 +102,7 @@ export default function Home() {
         </h1>
 
         <p className={styles.subtitle}>
-          Make a whiteboard, invite your friends, and collaborate together in real time.
+          Create a whiteboard, invite your friends, and collaborate together in real time.
         </p>
 
         <div className={styles.actions}>
@@ -117,7 +117,7 @@ export default function Home() {
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              {isCreating ? "Creating..." : "Create New Board"}
+              {isCreating ? "Creating..." : "Create New Whiteboard"}
             </button>
           ) : (
             <button
@@ -147,7 +147,7 @@ export default function Home() {
               disabled={!joinCode.trim()}
               id="join-board-btn"
             >
-              Join
+              Join Room
             </button>
           </form>
         </div>
