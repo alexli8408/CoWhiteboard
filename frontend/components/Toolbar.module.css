@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: space-between;
     height: 56px;
-    padding: 0 16px;
+    padding: 0 24px;
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-subtle);
     position: relative;
@@ -113,9 +113,6 @@
     position: relative;
     display: flex;
     align-items: center;
-    margin-left: 4px;
-    padding-left: 12px;
-    border-left: 1px solid var(--border-subtle);
 }
 
 .avatarBtn {
