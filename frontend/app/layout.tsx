@@ -3,7 +3,7 @@ import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
-  title: "CoWhiteboard — Collaborative Whiteboard",
+  title: "CoWhiteboard",
   description:
     "Real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking. Built with tldraw.",
   keywords: ["whiteboard", "collaboration", "brainstorming", "tldraw", "real-time"],
