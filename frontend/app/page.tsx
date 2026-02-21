@@ -102,7 +102,7 @@ export default function Home() {
         </h1>
 
         <p className={styles.subtitle}>
-          Create a board, invite your team, and brainstorm together in real time.
+          Make a whiteboard, invite your friends, and collaborate together in real time.
         </p>
 
         <div className={styles.actions}>
