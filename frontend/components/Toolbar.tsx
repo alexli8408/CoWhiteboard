@@ -86,8 +86,8 @@ export default function Toolbar({
                 </button>
 
                 <div className={styles.roomInfo} onClick={handleCopyCode} title="Click to copy room code" style={{ cursor: "pointer" }}>
-                    <span className={styles.roomLabel}>{codeCopied ? "Copied!" : "Room"}</span>
-                    <code className={styles.roomCode}>{roomId}</code>
+                    <span className={styles.roomLabel}>Room</span>
+                    <code className={styles.roomCode}>{codeCopied ? "Copied!" : roomId}</code>
                 </div>
             </div>
 
