@@ -20,6 +20,7 @@ export default function Toolbar({
     const { user, signOut } = useAuth();
     const [copied, setCopied] = useState(false);
     const [codeCopied, setCodeCopied] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
     const handleCopyCode = async () => {
         try {
@@ -165,20 +166,42 @@ export default function Toolbar({
 
                 {user && (
                     <div className={styles.toolbarUser}>
-                        {user.user_metadata?.avatar_url && (
-                            <img
-                                src={user.user_metadata.avatar_url}
-                                alt=""
-                                className={styles.toolbarAvatar}
-                            />
-                        )}
                         <button
-                            className={styles.signOutBtn}
-                            onClick={signOut}
-                            title="Sign out"
+                            className={styles.avatarBtn}
+                            onClick={() => setShowMenu(!showMenu)}
                         >
-                            Sign out
+                            {user.user_metadata?.avatar_url ? (
+                                <img
+                                    src={user.user_metadata.avatar_url}
+                                    alt=""
+                                    className={styles.toolbarAvatar}
+                                />
+                            ) : (
+                                <div className={styles.avatarFallback}>
+                                    {(user.user_metadata?.full_name?.[0] || user.email?.[0] || "?").toUpperCase()}
+                                </div>
+                            )}
                         </button>
+                        {showMenu && (
+                            <>
+                                <div className={styles.menuOverlay} onClick={() => setShowMenu(false)} />
+                                <div className={styles.dropdownMenu}>
+                                    <div className={styles.menuUser}>
+                                        <span className={styles.menuName}>
+                                            {user.user_metadata?.full_name || "User"}
+                                        </span>
+                                        <span className={styles.menuEmail}>{user.email}</span>
+                                    </div>
+                                    <div className={styles.menuDivider} />
+                                    <button
+                                        className={styles.menuSignOut}
+                                        onClick={() => { signOut(); setShowMenu(false); }}
+                                    >
+                                        Sign out
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

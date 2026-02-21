@@ -110,35 +110,111 @@
 }
 
 .toolbarUser {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
     margin-left: 4px;
     padding-left: 12px;
     border-left: 1px solid var(--border-subtle);
 }
 
-.toolbarAvatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-}
-
-.signOutBtn {
-    font-size: 12px;
-    font-family: inherit;
-    color: var(--text-muted);
+.avatarBtn {
     background: none;
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
-    padding: 3px 10px;
+    border: none;
+    padding: 0;
     cursor: pointer;
-    transition: all 0.2s ease;
+    border-radius: 50%;
+    transition: opacity 0.2s ease;
 }
 
-.signOutBtn:hover {
+.avatarBtn:hover {
+    opacity: 0.8;
+}
+
+.toolbarAvatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border-subtle);
+}
+
+.avatarFallback {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border-subtle);
+    background: var(--accent-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.menuOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 220px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.menuUser {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px;
+}
+
+.menuName {
+    font-size: 14px;
+    font-weight: 600;
     color: var(--text-primary);
-    border-color: var(--border-glow);
+}
+
+.menuEmail {
+    font-size: 12px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.menuDivider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 4px 0;
+}
+
+.menuSignOut {
+    width: 100%;
+    padding: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+}
+
+.menuSignOut:hover {
+    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
 }
 
 @media (max-width: 640px) {
