@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/components/AuthProvider";
@@ -12,6 +12,17 @@ export default function Home() {
   const [joinCode, setJoinCode] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+
+  // Redirect to saved URL after sign-in
+  useEffect(() => {
+    if (!loading && user) {
+      const redirect = localStorage.getItem("redirectAfterLogin");
+      if (redirect) {
+        localStorage.removeItem("redirectAfterLogin");
+        router.push(redirect);
+      }
+    }
+  }, [user, loading, router]);
 
   const handleCreateBoard = async () => {
     setIsCreating(true);
