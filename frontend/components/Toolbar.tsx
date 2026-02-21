@@ -19,14 +19,11 @@ export default function Toolbar({
     const router = useRouter();
     const { user, signOut } = useAuth();
     const [copied, setCopied] = useState(false);
-
-    const shortCode = roomId.slice(0, 8);
+    const [codeCopied, setCodeCopied] = useState(false);
 
     const handleCopyCode = async () => {
         try {
             await navigator.clipboard.writeText(roomId);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
         } catch {
             const input = document.createElement("input");
             input.value = roomId;
@@ -34,9 +31,9 @@ export default function Toolbar({
             input.select();
             document.execCommand("copy");
             document.body.removeChild(input);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
         }
+        setCodeCopied(true);
+        setTimeout(() => setCodeCopied(false), 2000);
     };
 
     const handleCopyLink = async () => {
@@ -89,8 +86,8 @@ export default function Toolbar({
                 </button>
 
                 <div className={styles.roomInfo} onClick={handleCopyCode} title="Click to copy room code" style={{ cursor: "pointer" }}>
-                    <span className={styles.roomLabel}>Room</span>
-                    <code className={styles.roomCode}>{shortCode}</code>
+                    <span className={styles.roomLabel}>{codeCopied ? "Copied!" : "Room"}</span>
+                    <code className={styles.roomCode}>{roomId}</code>
                 </div>
             </div>
 
