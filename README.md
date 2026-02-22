@@ -83,10 +83,11 @@ CoWhiteboard/
 │   │   ├── icon.svg              # Favicon
 │   │   ├── layout.tsx            # Root layout
 │   │   ├── auth/callback/        # OAuth callback handler
-│   │   └── board/[roomId]/       # Board page (dynamic route)
+│   │   └── whiteboard/[roomId]/    # Board page (dynamic route)
 │   ├── components/
 │   │   ├── WhiteboardCanvas.tsx  # tldraw canvas + WebSocket sync
 │   │   ├── Toolbar.tsx           # Room toolbar with sharing
+│   │   ├── Toolbar.module.css    # Room toolbar styles
 │   │   ├── AuthProvider.tsx      # Auth context provider
 │   │   └── AuthGuard.tsx         # Route protection with redirect
 │   └── lib/
