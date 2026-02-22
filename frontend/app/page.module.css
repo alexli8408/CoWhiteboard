@@ -52,6 +52,7 @@
   height: 32px;
   border-radius: 50%;
   border: 2px solid var(--border-subtle);
+  transition: border-color 0.2s ease;
 }
 
 .navAvatarFallback {
@@ -66,6 +67,7 @@
   font-size: 14px;
   font-weight: 600;
   color: white;
+  transition: border-color 0.2s ease;
 }
 
 .navUser {
@@ -78,11 +80,11 @@
   padding: 0;
   cursor: pointer;
   border-radius: 50%;
-  transition: opacity 0.2s ease;
 }
 
-.avatarBtn:hover {
-  opacity: 0.8;
+.avatarBtn:hover .navAvatar,
+.avatarBtn:hover .navAvatarFallback {
+  border-color: var(--accent-start);
 }
 
 .menuOverlay {
@@ -102,6 +104,19 @@
   padding: 8px;
   z-index: 100;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: dropdownSlide 0.15s ease-out;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .menuUser {
