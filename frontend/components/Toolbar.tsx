@@ -38,7 +38,7 @@ export default function Toolbar({
     };
 
     const handleCopyLink = async () => {
-        const url = `${window.location.origin}/board/${roomId}`;
+        const url = `${window.location.origin}/whiteboard/${roomId}`;
         try {
             await navigator.clipboard.writeText(url);
             setCopied(true);

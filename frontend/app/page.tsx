@@ -37,12 +37,12 @@ export default function Home() {
   const handleCreateBoard = async () => {
     setIsCreating(true);
     const roomId = generateRoomCode();
-    router.push(`/board/${roomId}`);
+    router.push(`/whiteboard/${roomId}`);
   };
 
   const handleSignInAndCreate = () => {
     const roomId = generateRoomCode();
-    localStorage.setItem("redirectAfterLogin", `/board/${roomId}`);
+    localStorage.setItem("redirectAfterLogin", `/whiteboard/${roomId}`);
     signInWithGoogle();
   };
 
@@ -50,7 +50,7 @@ export default function Home() {
     e.preventDefault();
     const code = joinCode.trim();
     if (code) {
-      router.push(`/board/${code}`);
+      router.push(`/whiteboard/${code}`);
     }
   };
 
