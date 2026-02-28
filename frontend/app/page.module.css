@@ -278,6 +278,7 @@
   background: var(--bg-card);
   border: none;
   outline: none;
+  cursor: text;
 }
 
 .joinInput::placeholder {
