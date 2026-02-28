@@ -68,7 +68,6 @@ export default function Toolbar({
                 <button
                     className={styles.backBtn}
                     onClick={() => router.push("/")}
-                    title="Back to home"
                     id="back-home-btn"
                 >
                     <svg
