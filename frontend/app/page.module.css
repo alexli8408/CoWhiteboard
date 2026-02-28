@@ -166,21 +166,43 @@
 }
 
 .navSignIn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 13px;
   font-family: inherit;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  font-weight: 600;
+  color: white;
+  background: var(--accent-gradient);
+  border: none;
   border-radius: var(--radius-sm);
-  padding: 6px 16px;
+  padding: 8px 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.navSignIn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .navSignIn:hover {
-  color: var(--text-primary);
-  border-color: var(--border-glow);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
+}
+
+.navSignIn:hover::before {
+  opacity: 1;
+}
+
+.navSignIn:active {
+  transform: translateY(0);
 }
 
 /* Main content */
