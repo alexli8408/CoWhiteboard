@@ -19,7 +19,7 @@ const WhiteboardCanvas = dynamic(() => import("@/components/WhiteboardCanvas"), 
             color: 'var(--text-secondary)',
             fontSize: '15px',
         }}>
-            Loading canvas...
+            Loading whiteboard...
         </div>
     ),
 });
