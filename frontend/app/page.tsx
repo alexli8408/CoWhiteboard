@@ -34,7 +34,7 @@ export default function Home() {
     }
   }, [user, loading, router]);
 
-  const handleCreateBoard = async () => {
+  const handleCreateBoard = () => {
     setIsCreating(true);
     const roomId = generateRoomCode();
     router.push(`/whiteboard/${roomId}`);
