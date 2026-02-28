@@ -11,8 +11,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
-  padding: 0 28px;
+  height: 56px;
+  padding: 0 24px;
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
@@ -24,7 +24,7 @@
 }
 
 .navLogo {
-  font-size: 24px;
+  font-size: 22px;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -32,7 +32,7 @@
 }
 
 .navName {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.02em;
   background: var(--accent-gradient);
@@ -48,23 +48,23 @@
 }
 
 .navAvatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2px solid var(--border-subtle);
   transition: border-color 0.2s ease;
 }
 
 .navAvatarFallback {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2px solid var(--border-subtle);
   background: var(--accent-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: white;
   transition: border-color 0.2s ease;
@@ -169,14 +169,14 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 13px;
   font-family: inherit;
   font-weight: 600;
   color: white;
   background: var(--accent-gradient);
   border: none;
   border-radius: var(--radius-sm);
-  padding: 10px 20px;
+  padding: 8px 18px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -311,8 +311,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 28px;
-  font-size: 14px;
+  padding: 16px 24px;
+  font-size: 13px;
   color: var(--text-muted);
   border-top: 1px solid var(--border-subtle);
   flex-shrink: 0;
