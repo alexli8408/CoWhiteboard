@@ -161,7 +161,7 @@ export default function Home() {
             <input
               type="text"
               className={styles.joinInput}
-              placeholder={user ? "Enter a room code to join room..." : "Sign in to join a room"}
+              placeholder="Enter a room code to join room..."
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value)}
               disabled={!user}
