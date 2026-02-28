@@ -50,12 +50,7 @@ export default function Home() {
     e.preventDefault();
     const code = joinCode.trim();
     if (code) {
-      if (user) {
-        router.push(`/whiteboard/${code}`);
-      } else {
-        localStorage.setItem("redirectAfterLogin", `/whiteboard/${code}`);
-        signInWithGoogle();
-      }
+      router.push(`/whiteboard/${code}`);
     }
   };
 
@@ -166,15 +161,16 @@ export default function Home() {
             <input
               type="text"
               className={styles.joinInput}
-              placeholder="Enter a room code to join room..."
+              placeholder={user ? "Enter a room code to join room..." : "Sign in to join a room"}
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value)}
+              disabled={!user}
               id="join-code-input"
             />
             <button
               type="submit"
               className={styles.joinBtn}
-              disabled={!joinCode.trim()}
+              disabled={!user || !joinCode.trim()}
               id="join-board-btn"
             >
               Join Room
