@@ -133,7 +133,7 @@ body {
 /* tldraw full-screen container */
 .tldraw-container {
   position: fixed;
-  top: 56px;
+  top: 64px;
   left: 0;
   right: 0;
   bottom: 0;
