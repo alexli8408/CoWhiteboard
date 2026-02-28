@@ -50,7 +50,12 @@ export default function Home() {
     e.preventDefault();
     const code = joinCode.trim();
     if (code) {
-      router.push(`/whiteboard/${code}`);
+      if (user) {
+        router.push(`/whiteboard/${code}`);
+      } else {
+        localStorage.setItem("redirectAfterLogin", `/whiteboard/${code}`);
+        signInWithGoogle();
+      }
     }
   };
 
