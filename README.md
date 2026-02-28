@@ -1,25 +1,21 @@
 # CoWhiteboard
 
-A real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking — built with Next.js, FastAPI, tldraw, and Supabase.
-
----
+A real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking. Built with Next.js, FastAPI, tldraw, and Supabase.
 
 ## Features
 
-- **Infinite Canvas** — Sketch, draw, and write with the full tldraw toolset
-- **Real-time Collaboration** — Changes sync instantly across all users via WebSockets
-- **Auto-Save** — Board state is automatically persisted to Supabase at regular intervals
-- **Room Sharing** — Create rooms and invite collaborators with a short code or shareable link
-- **Google OAuth** — Passwordless sign-in powered by Supabase Auth
-- **Dark Mode** — A sleek dark theme applied across the entire app
-- **Smart Redirects** — Shared board links work even if the user isn't signed in yet
-
----
+- **Infinite Canvas** — Draw, write, and sketch with professional tools powered by tldraw
+- **Real-time Sync** — See everyone's changes instantly via WebSockets
+- **Auto-Save** — Boards are automatically persisted to Supabase
+- **Shareable Rooms** — Create a room and invite others with a short room code or link
+- **Google OAuth** — Sign in with Google via Supabase Auth
+- **Dark Mode** — Consistent dark theme across all devices
+- **Post-Login Redirect** — Shared board links work seamlessly, even when not signed in
 
 ## Tech Stack
 
 | Layer | Technology |
-| --- | --- |
+|---|---|
 | Frontend | Next.js 16, React 19, TypeScript |
 | Canvas | tldraw SDK |
 | Backend | FastAPI, Python |
@@ -27,8 +23,6 @@ A real-time collaborative whiteboard for brainstorming, wireframing, and visual 
 | Database | Supabase (PostgreSQL) |
 | Auth | Supabase Auth (Google OAuth) |
 | Hosting | Vercel (frontend), Railway (backend) |
-
----
 
 ## Getting Started
 
@@ -40,10 +34,10 @@ A real-time collaborative whiteboard for brainstorming, wireframing, and visual 
 
 ### 1. Database Setup
 
-Run the migration in your Supabase SQL Editor:
+Run the SQL migration in your Supabase SQL Editor:
 
 ```sql
--- Copy and execute the contents of supabase/migration.sql
+-- Copy contents of supabase/migration.sql
 ```
 
 ### 2. Backend
@@ -54,7 +48,7 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Create .env from the example and fill in your Supabase credentials
+# Create .env with your Supabase credentials
 cp .env.example .env
 
 uvicorn app.main:app --reload --port 8000
@@ -66,7 +60,7 @@ uvicorn app.main:app --reload --port 8000
 cd frontend
 npm install
 
-# Create .env.local with the following variables:
+# Create .env.local with your environment variables:
 # NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
 # NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 # NEXT_PUBLIC_WS_URL=ws://localhost:8000
@@ -77,58 +71,50 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) and start collaborating.
 
----
-
 ## Project Structure
 
 ```
 CoWhiteboard/
-├── frontend/                       # Next.js client
+├── frontend/                     # Next.js app
 │   ├── app/
-│   │   ├── page.tsx                # Landing page
-│   │   ├── page.module.css         # Landing page styles
-│   │   ├── globals.css             # Global design tokens and utilities
-│   │   ├── layout.tsx              # Root layout with auth provider
-│   │   ├── icon.svg                # Favicon
-│   │   ├── auth/callback/          # OAuth redirect handler
-│   │   └── whiteboard/[roomId]/    # Collaborative board (dynamic route)
+│   │   ├── page.tsx              # Landing page
+│   │   ├── page.module.css       # Landing page styles
+│   │   ├── globals.css           # Global design system
+│   │   ├── icon.svg              # Favicon
+│   │   ├── layout.tsx            # Root layout
+│   │   ├── auth/callback/        # OAuth callback handler
+│   │   └── whiteboard/[roomId]/    # Board page (dynamic route)
 │   ├── components/
-│   │   ├── WhiteboardCanvas.tsx    # tldraw canvas with WebSocket sync
-│   │   ├── Toolbar.tsx             # Room toolbar (sharing, status, user)
-│   │   ├── Toolbar.module.css      # Toolbar styles
-│   │   ├── AuthProvider.tsx        # Auth context provider
-│   │   └── AuthGuard.tsx           # Route protection with redirect
+│   │   ├── WhiteboardCanvas.tsx  # tldraw canvas + WebSocket sync
+│   │   ├── Toolbar.tsx           # Room toolbar with sharing
+│   │   ├── Toolbar.module.css    # Room toolbar styles
+│   │   ├── AuthProvider.tsx      # Auth context provider
+│   │   └── AuthGuard.tsx         # Route protection with redirect
 │   └── lib/
-│       └── supabaseClient.ts       # Supabase browser client
-├── backend/                        # FastAPI server
+│       └── supabaseClient.ts     # Supabase browser client
+├── backend/                      # FastAPI app
 │   ├── app/
-│   │   ├── main.py                 # App entry point and CORS config
-│   │   ├── config.py               # Environment configuration
-│   │   ├── room_manager.py         # WebSocket room and connection manager
-│   │   ├── supabase_client.py      # Supabase client singleton
+│   │   ├── main.py               # Entry point + CORS config
+│   │   ├── config.py             # Environment config
+│   │   ├── room_manager.py       # WebSocket connection tracking
+│   │   ├── supabase_client.py    # Supabase DB client
 │   │   └── routers/
-│   │       ├── rooms.py            # REST endpoints for room CRUD
-│   │       └── ws.py               # WebSocket endpoint with auto-save
+│   │       ├── rooms.py          # REST API for room operations
+│   │       └── ws.py             # WebSocket endpoint
 │   ├── requirements.txt
-│   ├── Procfile                    # Railway process definition
-│   └── railway.toml                # Railway build config
+│   ├── Procfile                  # Railway deployment
+│   └── railway.toml              # Railway config
 └── supabase/
-    └── migration.sql               # Database schema (rooms + snapshots)
+    └── migration.sql             # Database schema
 ```
-
----
 
 ## Deployment
 
-| Service | Platform | Root Directory |
-| --- | --- | --- |
-| Frontend | [Vercel](https://vercel.com) | `frontend/` |
-| Backend | [Railway](https://railway.app) | `backend/` |
-| Database | [Supabase](https://supabase.com) | — |
+- **Frontend**: Deployed to [Vercel](https://vercel.com) from the `frontend/` root directory
+- **Backend**: Deployed to [Railway](https://railway.app) from the `backend/` root directory
+- **Database**: Hosted on [Supabase](https://supabase.com)
 
-Set the same environment variables listed in the Getting Started section on each platform.
-
----
+Environment variables must be configured on each platform. See the Getting Started section for the required variables.
 
 ## License
 
