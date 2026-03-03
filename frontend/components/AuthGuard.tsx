@@ -10,10 +10,17 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (!loading && !user) {
-            // Save the intended destination so we can redirect after sign-in
-            const currentPath = window.location.pathname;
-            if (currentPath !== "/") {
-                localStorage.setItem("redirectAfterLogin", currentPath);
+            const explicitSignOut = localStorage.getItem("explicitSignOut");
+            if (explicitSignOut) {
+                // User explicitly signed out — don't save a redirect
+                localStorage.removeItem("explicitSignOut");
+                localStorage.removeItem("redirectAfterLogin");
+            } else {
+                // User navigated here while not signed in — save redirect
+                const currentPath = window.location.pathname;
+                if (currentPath !== "/") {
+                    localStorage.setItem("redirectAfterLogin", currentPath);
+                }
             }
             router.replace("/");
         }
