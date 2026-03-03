@@ -184,21 +184,21 @@ sequenceDiagram
     participant WS as FastAPI (ws.py)
     participant DB as Supabase PostgreSQL
 
-    Note over User, DB: User navigates to /whiteboard/abc-123
+    Note over User,DB: User navigates to /whiteboard/abc-123
 
-    User->>WS: HTTP Upgrade Request (wss://...)
+    User->>WS: HTTP Upgrade Request
     WS-->>User: HTTP 101 Switching Protocols (Connection Accepted)
 
-    WS->>DB: PostgreSQL Query: SELECT data FROM snapshots WHERE room_id = 'abc-123' ORDER BY created_at DESC LIMIT 1
+    WS->>DB: SELECT data FROM snapshots WHERE room_id='abc-123' LIMIT 1
     DB-->>WS: Return JSONB blob payload
 
-    WS-->>User: WSS Send Text: {"type": "init", "snapshot": data, "userCount": x}
+    WS-->>User: send JSON (type: init, snapshot: data, userCount: x)
 
     User->>User: editor.store.mergeRemoteChanges(data)
     Note over User: Tldraw renders initial shapes to the DOM 🎨
 
-    WS->>WS: RoomManager.broadcast({"type": "user_count"})
-    WS-->>User (Others connected): WSS: Send Updated User Count Int
+    WS->>WS: RoomManager.broadcast(type: user_count)
+    WS-->>User: (To others connected) Send Updated User Count Int
 ```
 
 ### 6.2 The Real-Time Synchronization Loop (Collaboration & Cursors)
@@ -212,12 +212,12 @@ sequenceDiagram
     participant Server as FastAPI WebSocket Loop
     participant DB as Supabase PostgreSQL
 
-    Alice->>Alice: User draws a curved vector line...
+    Alice->>Alice: User draws a curved vector line
     Note over Alice: Tldraw native listener fires event
-    Alice->>Server: {"type": "update", "changes": {id: 4, action: "add"}, "data": [...full_store]}
+    Alice->>Server: send JSON (type: update, changes data, full_store)
 
-    Server->>Server: Is WebSocket sender equal to Alice? Yes, exclude Alice from broadcast iteration.
-    Server->>Bob: broadcast({"type": "update", "changes": ...})
+    Server->>Server: Sender is Alice? Exclude Alice from broadcast.
+    Server->>Bob: broadcast (type: update, changes data)
 
     Bob->>Bob: isApplyingRemoteRef = true
     Bob->>Bob: editor.store.mergeRemoteChanges(changes)
@@ -226,9 +226,9 @@ sequenceDiagram
 
     Server->>Server: Check _last_snapshot timer diff
     alt 30 Seconds Elapsed
-        Note over Server, DB: Database Auto-Save Triggered
-        Server->>DB: INSERT INTO snapshots (data, room_id) VALUES (...full_store, 'abc-123')
-        Server->>Server: _last_snapshot['abc-123'] = time.time()
+        Note over Server,DB: Database Auto-Save Triggered
+        Server->>DB: INSERT INTO snapshots (data, room_id)
+        Server->>Server: Update last snapshot time
     end
 ```
 
