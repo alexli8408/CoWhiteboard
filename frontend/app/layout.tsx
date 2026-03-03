@@ -7,6 +7,27 @@ export const metadata: Metadata = {
   description:
     "Real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking. Built with tldraw.",
   keywords: ["whiteboard", "collaboration", "brainstorming", "tldraw", "real-time"],
+  openGraph: {
+    title: "CoWhiteboard",
+    description:
+      "Real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking. Built with tldraw.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1024,
+        height: 1024,
+        alt: "CoWhiteboard – Real-time collaborative whiteboard",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CoWhiteboard",
+    description:
+      "Real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking. Built with tldraw.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
