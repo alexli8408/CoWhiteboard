@@ -46,12 +46,10 @@ export default function Home() {
     signInWithGoogle();
   };
 
-  const isValidCode = /^[a-z0-9]{8}$/.test(joinCode.trim());
-
   const handleJoinBoard = (e: React.FormEvent) => {
     e.preventDefault();
     const code = joinCode.trim();
-    if (isValidCode) {
+    if (code) {
       router.push(`/whiteboard/${code}`);
     }
   };
@@ -163,17 +161,16 @@ export default function Home() {
             <input
               type="text"
               className={styles.joinInput}
-              placeholder="Enter 8-character room code..."
+              placeholder="Enter a room code to join room..."
               value={joinCode}
-              onChange={(e) => setJoinCode(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8))}
+              onChange={(e) => setJoinCode(e.target.value)}
               disabled={!user}
-              maxLength={8}
               id="join-code-input"
             />
             <button
               type="submit"
               className={styles.joinBtn}
-              disabled={!user || !isValidCode}
+              disabled={!user || !joinCode.trim()}
               id="join-board-btn"
             >
               Join Room
