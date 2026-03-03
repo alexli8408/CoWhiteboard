@@ -180,8 +180,8 @@ How the system hydrates a blank canvas when a user opens an invite link. Notice 
 
 ```mermaid
 sequenceDiagram
-    participant User as Next.js (WhiteboardCanvas.tsx)
-    participant WS as FastAPI (ws.py)
+    participant User as NextJS Client
+    participant WS as FastAPI Server
     participant DB as Supabase PostgreSQL
 
     Note over User,DB: User navigates to /whiteboard/abc-123
@@ -207,8 +207,8 @@ How the system creates the illusion of seamless real-time collaborative ink. Thi
 
 ```mermaid
 sequenceDiagram
-    participant Alice as Alice (Next.js)
-    participant Bob as Bob (Next.js)
+    participant Alice as Alice Client
+    participant Bob as Bob Client
     participant Server as FastAPI WebSocket Loop
     participant DB as Supabase PostgreSQL
 
