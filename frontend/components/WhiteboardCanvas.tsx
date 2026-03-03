@@ -24,13 +24,25 @@ export default function WhiteboardCanvas({
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isApplyingRemoteRef = useRef(false);
 
+    // Stable refs for callbacks to avoid re-creating connectWebSocket
+    const onUserCountChangeRef = useRef(onUserCountChange);
+    const onConnectionStatusChangeRef = useRef(onConnectionStatusChange);
+    useEffect(() => { onUserCountChangeRef.current = onUserCountChange; }, [onUserCountChange]);
+    useEffect(() => { onConnectionStatusChangeRef.current = onConnectionStatusChange; }, [onConnectionStatusChange]);
+
+    // Track intentional close to prevent auto-reconnect on navigation
+    const intentionalCloseRef = useRef(false);
+
+    // Buffer snapshot if it arrives before the editor mounts
+    const pendingSnapshotRef = useRef<Record<string, TLRecord> | null>(null);
+
     const connectWebSocket = useCallback(() => {
         const ws = new WebSocket(`${WS_URL}/ws/${roomId}`);
         wsRef.current = ws;
 
         ws.onopen = () => {
             console.log(`[CoWhiteboard] Connected to room ${roomId}`);
-            onConnectionStatusChange("connected");
+            onConnectionStatusChangeRef.current("connected");
         };
 
         ws.onmessage = (event) => {
@@ -39,24 +51,30 @@ export default function WhiteboardCanvas({
 
                 if (message.type === "init") {
                     // Load initial snapshot if available
-                    if (message.snapshot && editorRef.current) {
-                        isApplyingRemoteRef.current = true;
-                        try {
-                            const editor = editorRef.current;
-                            const records: TLRecord[] = Object.values(message.snapshot);
-                            if (records.length > 0) {
-                                editor.store.mergeRemoteChanges(() => {
-                                    editor.store.put(records);
-                                });
+                    if (message.snapshot) {
+                        const records: TLRecord[] = Object.values(message.snapshot);
+                        if (records.length > 0) {
+                            if (editorRef.current) {
+                                // Editor is ready — apply immediately
+                                isApplyingRemoteRef.current = true;
+                                try {
+                                    editorRef.current.store.mergeRemoteChanges(() => {
+                                        editorRef.current!.store.put(records);
+                                    });
+                                } catch (e) {
+                                    console.warn("[CoWhiteboard] Failed to apply initial snapshot:", e);
+                                } finally {
+                                    isApplyingRemoteRef.current = false;
+                                }
+                            } else {
+                                // Editor not mounted yet — buffer the snapshot
+                                console.log("[CoWhiteboard] Buffering snapshot until editor mounts");
+                                pendingSnapshotRef.current = message.snapshot;
                             }
-                        } catch (e) {
-                            console.warn("[CoWhiteboard] Failed to apply initial snapshot:", e);
-                        } finally {
-                            isApplyingRemoteRef.current = false;
                         }
                     }
                     if (message.userCount) {
-                        onUserCountChange(message.userCount);
+                        onUserCountChangeRef.current(message.userCount);
                     }
                 } else if (message.type === "update") {
                     // Apply remote changes from another user
@@ -90,7 +108,7 @@ export default function WhiteboardCanvas({
                         }
                     }
                 } else if (message.type === "user_count") {
-                    onUserCountChange(message.count);
+                    onUserCountChangeRef.current(message.count);
                 }
             } catch (e) {
                 console.warn("[CoWhiteboard] Failed to parse message:", e);
@@ -98,8 +116,14 @@ export default function WhiteboardCanvas({
         };
 
         ws.onclose = () => {
+            if (intentionalCloseRef.current) {
+                // Intentional close (navigation away) — don't reconnect
+                console.log("[CoWhiteboard] Disconnected (intentional)");
+                onConnectionStatusChangeRef.current("disconnected");
+                return;
+            }
             console.log("[CoWhiteboard] Disconnected, reconnecting in 2s...");
-            onConnectionStatusChange("reconnecting");
+            onConnectionStatusChangeRef.current("reconnecting");
             reconnectTimeoutRef.current = setTimeout(() => {
                 connectWebSocket();
             }, 2000);
@@ -110,13 +134,15 @@ export default function WhiteboardCanvas({
         };
 
         return ws;
-    }, [roomId, onUserCountChange, onConnectionStatusChange]);
+    }, [roomId]);
 
     // Connect WebSocket on mount
     useEffect(() => {
+        intentionalCloseRef.current = false;
         const ws = connectWebSocket();
 
         return () => {
+            intentionalCloseRef.current = true;
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
             }
@@ -128,6 +154,25 @@ export default function WhiteboardCanvas({
     const handleMount = useCallback(
         (editor: Editor) => {
             editorRef.current = editor;
+
+            // Apply any buffered snapshot that arrived before the editor mounted
+            if (pendingSnapshotRef.current) {
+                const records: TLRecord[] = Object.values(pendingSnapshotRef.current);
+                if (records.length > 0) {
+                    isApplyingRemoteRef.current = true;
+                    try {
+                        editor.store.mergeRemoteChanges(() => {
+                            editor.store.put(records);
+                        });
+                        console.log("[CoWhiteboard] Applied buffered snapshot");
+                    } catch (e) {
+                        console.warn("[CoWhiteboard] Failed to apply buffered snapshot:", e);
+                    } finally {
+                        isApplyingRemoteRef.current = false;
+                    }
+                }
+                pendingSnapshotRef.current = null;
+            }
 
             // Listen for local changes and send them to the server
             const unsubscribe = editor.store.listen(
