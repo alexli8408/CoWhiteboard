@@ -37,27 +37,22 @@ The overarching system acts natively as a Client-Server paradigm with an attache
 
 ```mermaid
 graph TD
-    %% Entities
-    ClientA[Frontend Browser<br/>Client A (Next.js/Tldraw)]
-    ClientB[Frontend Browser<br/>Client B (Next.js/Tldraw)]
-    FastAPI[Backend Gateway<br/>FastAPI Web Server]
-    RoomMgr[Backend Memory<br/>RoomManager (Singleton)]
-    SupabaseDB[(Supabase DB<br/>PostgreSQL / Auth)]
+    ClientA["Frontend Client A"]
+    ClientB["Frontend Client B"]
+    FastAPI["FastAPI Web Server"]
+    RoomMgr["RoomManager (Memory)"]
+    SupabaseDB["Supabase PostgreSQL"]
 
-    %% HTTP Paths
-    ClientA -- "1. HTTP GET: Login/Session API" --> SupabaseDB
-    ClientA -- "2. HTTP GET/POST: Room Metadata" --> FastAPI
+    ClientA -- "HTTP GET: Login API" --> SupabaseDB
+    ClientA -- "HTTP GET: Room Meta" --> FastAPI
 
-    %% WebSocket Paths
-    ClientA <== "3. WSS: Canvas Diff Payloads" ==> FastAPI
-    ClientB <== "3. WSS: Canvas Diff Payloads" ==> FastAPI
+    ClientA <== "WSS: Canvas Diffs" ==> FastAPI
+    ClientB <== "WSS: Canvas Diffs" ==> FastAPI
 
-    %% Internal Backend Paths
-    FastAPI -- "4. Subscribes users to dict" --- RoomMgr
+    FastAPI -- "Subscribe users" --- RoomMgr
 
-    %% DB Hooks
-    FastAPI -- "5. REST: Fetch Latest Snapshot `JSONB`" --> SupabaseDB
-    FastAPI -- "6. REST: Auto-save Snapshots (Debounced)" --> SupabaseDB
+    FastAPI -- "REST: Fetch Snapshot" --> SupabaseDB
+    FastAPI -- "REST: Auto-save Blob" --> SupabaseDB
 ```
 
 ---
@@ -182,23 +177,23 @@ How the system hydrates a blank canvas when a user opens an invite link. Notice 
 sequenceDiagram
     participant User as NextJS Client
     participant WS as FastAPI Server
-    participant DB as Supabase PostgreSQL
+    participant DB as Supabase DB
 
-    Note over User,DB: User navigates to /whiteboard/abc-123
+    Note over User,DB: User navigates to room URL
 
     User->>WS: HTTP Upgrade Request
-    WS-->>User: HTTP 101 Switching Protocols (Connection Accepted)
+    WS-->>User: Link Established
 
-    WS->>DB: SELECT data FROM snapshots WHERE room_id='abc-123' LIMIT 1
-    DB-->>WS: Return JSONB blob payload
+    WS->>DB: Fetch Latest Snapshot
+    DB-->>WS: Return JSON Blob
 
-    WS-->>User: send JSON (type: init, snapshot: data, userCount: x)
+    WS-->>User: Send Init Payload
 
-    User->>User: editor.store.mergeRemoteChanges(data)
-    Note over User: Tldraw renders initial shapes to the DOM 🎨
+    User->>User: Render canvas
+    Note over User: User sees the board
 
-    WS->>WS: RoomManager.broadcast(type: user_count)
-    WS-->>User: (To others connected) Send Updated User Count Int
+    WS->>WS: Broadcast user count
+    WS-->>User: Send updated user count
 ```
 
 ### 6.2 The Real-Time Synchronization Loop (Collaboration & Cursors)
@@ -209,26 +204,25 @@ How the system creates the illusion of seamless real-time collaborative ink. Thi
 sequenceDiagram
     participant Alice as Alice Client
     participant Bob as Bob Client
-    participant Server as FastAPI WebSocket Loop
-    participant DB as Supabase PostgreSQL
+    participant Server as FastAPI Server
+    participant DB as Supabase DB
 
-    Alice->>Alice: User draws a curved vector line
-    Note over Alice: Tldraw native listener fires event
-    Alice->>Server: send JSON (type: update, changes data, full_store)
+    Alice->>Alice: Draws on canvas
+    Alice->>Server: Send Update Payload
 
-    Server->>Server: Sender is Alice? Exclude Alice from broadcast.
-    Server->>Bob: broadcast (type: update, changes data)
+    Server->>Server: Validate identity
+    Server->>Bob: Broadcast Update Payload
 
-    Bob->>Bob: isApplyingRemoteRef = true
-    Bob->>Bob: editor.store.mergeRemoteChanges(changes)
-    Bob->>Bob: isApplyingRemoteRef = false
-    Note over Bob: Tldraw renders Alice's line on Bob's screen! 🎨
+    Bob->>Bob: Lock canvas state
+    Bob->>Bob: Merge remote changes
+    Bob->>Bob: Unlock canvas state
+    Note over Bob: Bob sees Alice's drawing
 
-    Server->>Server: Check _last_snapshot timer diff
-    alt 30 Seconds Elapsed
-        Note over Server,DB: Database Auto-Save Triggered
-        Server->>DB: INSERT INTO snapshots (data, room_id)
-        Server->>Server: Update last snapshot time
+    Server->>Server: Check auto-save timer
+    alt Time Elapsed
+        Note over Server,DB: Trigger Auto-Save
+        Server->>DB: Insert Snapshot
+        Server->>Server: Reset timer
     end
 ```
 
