@@ -5,12 +5,12 @@ import AuthProvider from "@/components/AuthProvider";
 export const metadata: Metadata = {
   title: "CoWhiteboard",
   description:
-    "Real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking. Built with tldraw.",
+    "Create a whiteboard, invite your friends, and collaborate together in real time.",
   keywords: ["whiteboard", "collaboration", "brainstorming", "tldraw", "real-time"],
   openGraph: {
     title: "CoWhiteboard",
     description:
-      "Real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking. Built with tldraw.",
+      "Create a whiteboard, invite your friends, and collaborate together in real time.",
     images: [
       {
         url: "/og-image.png",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CoWhiteboard",
     description:
-      "Real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking. Built with tldraw.",
+      "Create a whiteboard, invite your friends, and collaborate together in real time.",
     images: ["/og-image.png"],
   },
 };
