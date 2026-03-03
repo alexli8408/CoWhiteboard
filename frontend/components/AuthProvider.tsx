@@ -62,6 +62,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const signOut = useCallback(async () => {
+        localStorage.removeItem("redirectAfterLogin");
         await supabase.auth.signOut();
         setUser(null);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
