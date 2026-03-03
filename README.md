@@ -13,6 +13,7 @@ A real-time collaborative whiteboard for brainstorming, wireframing, and visual 
 - **Google OAuth** — Sign in with Google via Supabase Auth
 - **Dark Mode** — Consistent dark theme with a purple accent gradient
 - **Post-Login Redirect** — Shared board links work seamlessly, even when not signed in
+- **Deep Architecture Documentation** — See the [Developer Log & Architecture Guide](./devlog.md) for sequence diagrams and system breakdowns
 
 ---
 
@@ -100,6 +101,7 @@ Open [http://localhost:3000](http://localhost:3000) and start collaborating.
 ---
 
 ## Project Structure
+*(For a deeper dive, including sequence diagrams and scaling plans, read the [Developer Log](./devlog.md))*
 
 ```
 CoWhiteboard/
