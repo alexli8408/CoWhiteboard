@@ -11,6 +11,8 @@ class RoomManager:
     def __init__(self):
         # room_id -> set of connected WebSocket clients
         self._rooms: dict[str, set[WebSocket]] = {}
+        # room_id -> latest in-memory snapshot (full serialized store)
+        self._snapshots: dict[str, dict] = {}
 
     async def join_room(self, room_id: str, websocket: WebSocket) -> int:
         """Add a client to a room. Returns the new user count."""
@@ -56,6 +58,18 @@ class RoomManager:
     def get_user_count(self, room_id: str) -> int:
         """Get the number of connected users in a room."""
         return len(self._rooms.get(room_id, set()))
+
+    def set_snapshot(self, room_id: str, data: dict):
+        """Update the in-memory snapshot for a room."""
+        self._snapshots[room_id] = data
+
+    def get_snapshot(self, room_id: str) -> dict | None:
+        """Get the in-memory snapshot for a room, if any."""
+        return self._snapshots.get(room_id)
+
+    def clear_snapshot(self, room_id: str):
+        """Remove the in-memory snapshot for a room."""
+        self._snapshots.pop(room_id, None)
 
 
 # Global singleton

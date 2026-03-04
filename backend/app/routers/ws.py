@@ -32,20 +32,25 @@ async def _ensure_room_exists(room_id: str):
         logger.error(f"Failed to ensure room exists {room_id}: {e}")
 
 
+async def _save_snapshot_to_db(room_id: str, data: dict):
+    """Save a snapshot to Supabase."""
+    try:
+        supabase = get_supabase()
+        supabase.table("snapshots").insert(
+            {"room_id": room_id, "data": data}
+        ).execute()
+        _last_snapshot[room_id] = time.time()
+        logger.info(f"Saved snapshot for room {room_id}")
+    except Exception as e:
+        logger.error(f"Failed to save snapshot for room {room_id}: {e}")
+
+
 async def _maybe_save_snapshot(room_id: str, data: dict):
     """Save a snapshot if enough time has passed since the last one."""
     now = time.time()
     last = _last_snapshot.get(room_id, 0)
     if now - last >= SNAPSHOT_INTERVAL:
-        _last_snapshot[room_id] = now
-        try:
-            supabase = get_supabase()
-            supabase.table("snapshots").insert(
-                {"room_id": room_id, "data": data}
-            ).execute()
-            logger.info(f"Auto-saved snapshot for room {room_id}")
-        except Exception as e:
-            logger.error(f"Failed to auto-save snapshot for room {room_id}: {e}")
+        await _save_snapshot_to_db(room_id, data)
 
 
 @router.websocket("/ws/{room_id}")
@@ -61,17 +66,27 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
     await _ensure_room_exists(room_id)
 
     # Send the latest snapshot to the new user
+    # Prefer in-memory snapshot (always up-to-date), fall back to Supabase
+    snapshot_data = room_manager.get_snapshot(room_id)
+    if snapshot_data is None:
+        try:
+            supabase = get_supabase()
+            result = (
+                supabase.table("snapshots")
+                .select("data")
+                .eq("room_id", room_id)
+                .order("created_at", desc=True)
+                .limit(1)
+                .execute()
+            )
+            snapshot_data = result.data[0]["data"] if result.data else None
+            # Cache it in memory for future joiners
+            if snapshot_data:
+                room_manager.set_snapshot(room_id, snapshot_data)
+        except Exception as e:
+            logger.error(f"Failed to load snapshot for room {room_id}: {e}")
+
     try:
-        supabase = get_supabase()
-        result = (
-            supabase.table("snapshots")
-            .select("data")
-            .eq("room_id", room_id)
-            .order("created_at", desc=True)
-            .limit(1)
-            .execute()
-        )
-        snapshot_data = result.data[0]["data"] if result.data else None
         await websocket.send_text(
             json.dumps(
                 {
@@ -82,10 +97,7 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             )
         )
     except Exception as e:
-        logger.error(f"Failed to load snapshot for room {room_id}: {e}")
-        await websocket.send_text(
-            json.dumps({"type": "init", "snapshot": None, "userCount": user_count})
-        )
+        logger.error(f"Failed to send init message for room {room_id}: {e}")
 
     # Broadcast updated user count to everyone in the room
     await room_manager.broadcast(
@@ -104,21 +116,17 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             if msg_type == "update":
                 # Broadcast tldraw store diff to other users
                 await room_manager.broadcast(room_id, message, exclude=websocket)
-                # Maybe auto-save
+                # Always update in-memory snapshot
                 if "data" in message:
+                    room_manager.set_snapshot(room_id, message["data"])
+                    # Periodically persist to Supabase
                     await _maybe_save_snapshot(room_id, message["data"])
 
             elif msg_type == "snapshot":
                 # Client explicitly wants to save state
                 if "data" in message:
-                    try:
-                        supabase = get_supabase()
-                        supabase.table("snapshots").insert(
-                            {"room_id": room_id, "data": message["data"]}
-                        ).execute()
-                        _last_snapshot[room_id] = time.time()
-                    except Exception as e:
-                        logger.error(f"Failed to save snapshot: {e}")
+                    room_manager.set_snapshot(room_id, message["data"])
+                    await _save_snapshot_to_db(room_id, message["data"])
 
             elif msg_type == "cursor":
                 # Broadcast cursor position
@@ -130,6 +138,12 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
         logger.error(f"WebSocket error in room {room_id}: {e}")
     finally:
         user_count = await room_manager.leave_room(room_id, websocket)
+        # Save snapshot to Supabase when the last user leaves
+        if user_count == 0:
+            final_snapshot = room_manager.get_snapshot(room_id)
+            if final_snapshot:
+                await _save_snapshot_to_db(room_id, final_snapshot)
+                room_manager.clear_snapshot(room_id)
         await room_manager.broadcast(
             room_id,
             {"type": "user_count", "count": user_count},
