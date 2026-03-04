@@ -1,19 +1,20 @@
-# CoWhiteboard
+# ⬡ CoWhiteboard
 
-A real-time collaborative whiteboard for brainstorming, wireframing, and visual thinking — built with Next.js, FastAPI, tldraw, and Supabase.
+Create a whiteboard, invite your friends, and collaborate together in real time.
+
+**[Live Demo →](https://cowhiteboard.vercel.app)**
 
 ---
 
 ## Features
 
-- **Infinite Canvas** — Draw, write, and sketch with professional tools powered by tldraw
+- **Infinite Canvas** — Draw, write, and sketch with professional tools powered by [tldraw](https://tldraw.dev)
 - **Real-time Sync** — See collaborators' changes instantly via WebSockets
-- **Auto-Save** — Board state is automatically persisted to Supabase every 30 seconds
-- **Shareable Rooms** — Create a room and invite others with a short 8-character code or link
+- **Persistent State** — Board state is cached in-memory for instant loading and auto-saved to Supabase
+- **Shareable Rooms** — Create a room and share it with a short code or a direct link
 - **Google OAuth** — Sign in with Google via Supabase Auth
-- **Dark Mode** — Consistent dark theme with a purple accent gradient
-- **Post-Login Redirect** — Shared board links work seamlessly, even when not signed in
-- **Deep Architecture Documentation** — See the [Developer Log & Architecture Guide](./devlog.md) for sequence diagrams and system breakdowns
+- **Smart Redirects** — Shared links work seamlessly even when not signed in
+- **Dark Mode** — Clean dark theme with a purple accent palette
 
 ---
 
@@ -21,10 +22,10 @@ A real-time collaborative whiteboard for brainstorming, wireframing, and visual 
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | Next.js 16, React 19, TypeScript |
-| Canvas | tldraw v4 SDK |
-| Backend | FastAPI, Python 3.11+ |
-| Real-time | WebSockets (native) |
+| Frontend | Next.js, React, TypeScript |
+| Canvas | tldraw SDK |
+| Backend | FastAPI, Python |
+| Real-time | WebSockets |
 | Database | Supabase (PostgreSQL) |
 | Auth | Supabase Auth (Google OAuth) |
 | Hosting | Vercel (frontend), Railway (backend) |
@@ -39,14 +40,14 @@ A real-time collaborative whiteboard for brainstorming, wireframing, and visual 
 - Python 3.11+
 - A [Supabase](https://supabase.com) project with Google OAuth configured
 
-### 1. Clone the Repository
+### 1. Clone
 
 ```bash
 git clone https://github.com/alexli8408/CoWhiteboard.git
 cd CoWhiteboard
 ```
 
-### 2. Database Setup
+### 2. Database
 
 Run the migration in your [Supabase SQL Editor](https://supabase.com/dashboard):
 
@@ -64,13 +65,10 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Create .env with your Supabase credentials
-cp .env.example .env
+cp .env.example .env   # Fill in your Supabase credentials
 
 uvicorn app.main:app --reload --port 8000
 ```
-
-**Required environment variables** (`backend/.env`):
 
 | Variable | Description |
 | --- | --- |
@@ -82,41 +80,32 @@ uvicorn app.main:app --reload --port 8000
 ```bash
 cd frontend
 npm install
-
-# Create .env.local with your environment variables
 npm run dev
 ```
-
-**Required environment variables** (`frontend/.env.local`):
 
 | Variable | Description |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon/public key |
 | `NEXT_PUBLIC_WS_URL` | WebSocket server URL (default: `ws://localhost:8000`) |
-| `NEXT_PUBLIC_TLDRAW_LICENSE_KEY` | Your tldraw license key |
 
 Open [http://localhost:3000](http://localhost:3000) and start collaborating.
 
 ---
 
 ## Project Structure
-*(For a deeper dive, including sequence diagrams and scaling plans, read the [Developer Log](./devlog.md))*
 
 ```
 CoWhiteboard/
 ├── frontend/                      # Next.js app
 │   ├── app/
-│   │   ├── page.tsx               # Landing page
-│   │   ├── page.module.css        # Landing page styles
-│   │   ├── globals.css            # Global design tokens and shared styles
-│   │   ├── layout.tsx             # Root layout with AuthProvider
+│   │   ├── layout.tsx             # Root layout with AuthProvider + OG meta
+│   │   ├── page.tsx               # Landing / hero page
 │   │   ├── auth/callback/         # OAuth callback handler
 │   │   └── whiteboard/[roomId]/   # Whiteboard page (dynamic route)
 │   ├── components/
 │   │   ├── WhiteboardCanvas.tsx   # tldraw canvas + WebSocket sync
-│   │   ├── Toolbar.tsx            # Room toolbar (sharing, user count, status)
-│   │   ├── Toolbar.module.css     # Toolbar styles
+│   │   ├── Toolbar.tsx            # Room toolbar (share, user count, status)
 │   │   ├── AuthProvider.tsx       # Auth context provider
 │   │   └── AuthGuard.tsx          # Route protection with redirect
 │   └── lib/
@@ -125,14 +114,13 @@ CoWhiteboard/
 │   ├── app/
 │   │   ├── main.py                # Entry point, CORS, router registration
 │   │   ├── config.py              # Environment variable config
-│   │   ├── room_manager.py        # WebSocket room/connection management
+│   │   ├── room_manager.py        # Room/connection + in-memory snapshot management
 │   │   ├── supabase_client.py     # Supabase client singleton
 │   │   └── routers/
 │   │       ├── rooms.py           # REST endpoints (CRUD, snapshots)
 │   │       └── ws.py              # WebSocket endpoint + auto-save
 │   ├── requirements.txt
-│   ├── Procfile                   # Railway deployment
-│   └── railway.toml               # Railway config
+│   └── Procfile                   # Railway deployment
 └── supabase/
     └── migration.sql              # Database schema (rooms + snapshots)
 ```
@@ -141,10 +129,10 @@ CoWhiteboard/
 
 ## How It Works
 
-1. **Create or Join** — Users sign in with Google and create a new whiteboard or join an existing room via a short code.
+1. **Create or Join** — Sign in with Google, then create a new whiteboard or join an existing room with a code.
 2. **Draw** — The tldraw SDK provides a full-featured canvas with drawing tools, shapes, text, and more.
-3. **Sync** — Local changes are captured via a tldraw store listener and sent over a WebSocket connection to the FastAPI backend, which broadcasts them to all other users in the room.
-4. **Persist** — The backend auto-saves a snapshot of the board to Supabase (PostgreSQL) every 30 seconds. When a user joins a room, the latest snapshot is loaded and merged into the canvas.
+3. **Sync** — Local changes are captured via a tldraw store listener and sent over WebSockets to the backend, which broadcasts them to all other users in the room.
+4. **Persist** — Every update is cached in-memory on the backend for instant loading. Snapshots are also periodically saved to Supabase and persisted when the last user leaves.
 
 ---
 
