@@ -10,17 +10,7 @@ import { useState } from "react";
 const WhiteboardCanvas = dynamic(() => import("@/components/WhiteboardCanvas"), {
     ssr: false,
     loading: () => (
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100vh',
-            background: 'var(--bg-primary)',
-            color: 'var(--text-secondary)',
-            fontSize: '15px',
-        }}>
-            Loading whiteboard...
-        </div>
+        <div style={{ height: '100vh', background: 'var(--bg-primary)' }} />
     ),
 });
 
