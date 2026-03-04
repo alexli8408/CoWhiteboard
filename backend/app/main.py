@@ -2,7 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import rooms, ws
+from app.routers import ws
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -30,6 +30,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://cowhiteboard.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -37,7 +38,6 @@ app.add_middleware(
 )
 
 # Register routers
-app.include_router(rooms.router)
 app.include_router(ws.router)
 
 

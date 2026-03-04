@@ -285,6 +285,11 @@
   color: var(--text-muted);
 }
 
+.joinInput:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .joinBtn {
   padding: 14px 24px;
   font-size: 14px;

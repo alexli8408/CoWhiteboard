@@ -28,19 +28,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
     if (loading) {
         return (
-            <div
-                style={{
-                    height: "100vh",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "var(--bg-primary)",
-                    color: "var(--text-secondary)",
-                    fontSize: "1.1rem",
-                }}
-            >
-                Loading...
-            </div>
+            <div style={{ height: "100vh", background: "var(--bg-primary)" }} />
         );
     }
 

@@ -117,7 +117,6 @@ CoWhiteboard/
 │   │   ├── room_manager.py        # Room/connection + in-memory snapshot management
 │   │   ├── supabase_client.py     # Supabase client singleton
 │   │   └── routers/
-│   │       ├── rooms.py           # REST endpoints (CRUD, snapshots)
 │   │       └── ws.py              # WebSocket endpoint + auto-save
 │   ├── requirements.txt
 │   └── Procfile                   # Railway deployment
